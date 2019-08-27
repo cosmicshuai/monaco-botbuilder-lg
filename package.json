@@ -1,0 +1,26 @@
+{
+  "name": "monaco-lg-extension",
+  "version": "0.1.0",
+  "description": "Microsoft botbuilder-lg support for Monaco Editor",
+  "scripts": {
+    "compile-amd": "mcopy ./src/lib/LGbundle.js ./release/dev/lib/LGbundle.js && tsc -p ./src/tsconfig.json",
+    "compile-esm": "mcopy ./src/lib/LGbundle.js ./release/esm/lib/LGbundle.js && tsc -p ./src/tsconfig.esm.json",
+    "compile": "mrmdir ./release && npm run compile-amd && npm run compile-esm",
+    "watch": "tsc -p ./src --watch",
+    "prepublishOnly": "npm run compile && node ./scripts/bundle && mcopy ./src/monaco.d.ts ./release/monaco.d.ts"
+  },
+  "author": "Microsoft Corporation",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "devDependencies": {
+    "monaco-editor-core": "^0.16.0",
+    "monaco-languages": "^1.7.0",
+    "monaco-plugin-helpers": "^1.0.2",
+    "requirejs": "^2.3.6",
+    "typescript": "^3.5.1",
+    "uglify-js": "^3.4.9"
+  }
+}
