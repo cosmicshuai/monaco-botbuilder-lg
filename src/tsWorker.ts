@@ -34,7 +34,7 @@ export class LGWorker {
 		return '';
 	}
 
-	// --- language features
+	// // --- language features
 	// getQuickInfoAtPosition(fileName: string, position: number): Promise<ts.QuickInfo> {
 	// 	return Promise.resolve(this._languageService.getQuickInfoAtPosition(fileName, position));
 	// }

@@ -17,12 +17,6 @@ import IDisposable = monaco.IDisposable;
 
 //#region utils copied from typescript to prevent loading the entire typescriptServices ---
 
-enum IndentStyle {
-	None = 0,
-	Block = 1,
-	Smart = 2
-}
-
 function flattenDiagnosticMessageText(messageText: string | ts.DiagnosticMessageChain, newLine: '\n'): string {
 	if (typeof messageText === "string") {
 		return messageText;
@@ -201,12 +195,6 @@ export class DiagnostcsAdapter extends Adapter {
 }
 
 // --- suggest ------
-
-interface MyCompletionItem extends monaco.languages.CompletionItem {
-	uri: Uri;
-	position: Position;
-}
-
 export class SuggestAdapter extends Adapter implements monaco.languages.CompletionItemProvider {
 
 	public get triggerCharacters(): string[] {
@@ -675,7 +663,7 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
 // 	}
 // }
 
-// // --- hover ------
+// --- hover ------
 
 // export class QuickInfoAdapter extends Adapter implements monaco.languages.HoverProvider {
 

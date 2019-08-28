@@ -17,7 +17,6 @@ export class WorkerManager {
 	private _idleCheckInterval: number;
 	private _lastUsedTime: number;
 	private _configChangeListener: IDisposable;
-	private _extraLibsChangeListener: IDisposable;
 
 	private _worker: monaco.editor.MonacoWebWorker<LGWorker>;
 	private _client: Promise<LGWorker>;
@@ -42,7 +41,6 @@ export class WorkerManager {
 	dispose(): void {
 		clearInterval(this._idleCheckInterval);
 		this._configChangeListener.dispose();
-		this._extraLibsChangeListener.dispose();
 		this._stopWorker();
 	}
 
