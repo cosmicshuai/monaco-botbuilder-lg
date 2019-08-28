@@ -1,13 +1,13 @@
 {
   "name": "monaco-botbuilder-lg",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Microsoft botbuilder-lg support for Monaco Editor",
   "scripts": {
     "compile-amd": "mcopy ./src/lib/LGbundle.js ./release/dev/lib/LGbundle.js && tsc -p ./src/tsconfig.json",
     "compile-esm": "mcopy ./src/lib/LGbundle.js ./release/esm/lib/LGbundle.js && tsc -p ./src/tsconfig.esm.json",
     "compile": "mrmdir ./release && npm run compile-amd && npm run compile-esm",
     "watch": "tsc -p ./src --watch",
-    "prepublishOnly": "npm run compile && node ./scripts/bundle && mcopy ./src/monaco.d.ts ./release/monaco.d.ts"
+    "prepublishOnly": "npm run compile && node ./scripts/bundle"
   },
   "author": "Microsoft Corporation",
   "license": "MIT",
