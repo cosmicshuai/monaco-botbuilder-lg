@@ -41,8 +41,6 @@ export interface QuickInfo {
 
 enum ScriptElementKind {
     unknown = "",
-    warning = "warning",
-    keyword = "keyword",
     template = "template",
     function = "function"
 }
