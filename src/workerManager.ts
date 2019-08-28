@@ -62,8 +62,7 @@ export class WorkerManager {
 		if (!this._client) {
 			this._worker = monaco.editor.createWebWorker<LGWorker>({
 				// module that exports the create() method and returns a `LGWorker` instance
-				moduleId: 'vs/language/typescript/tsWorker',
-
+				moduleId: 'vs/language/botbuilder-lg/tsWorker',
 				label: this._modeId,
 			});
 

@@ -1,5 +1,5 @@
 {
-  "name": "monaco-botbuilder-lg1",
+  "name": "monaco-botbuilder-lg",
   "version": "0.1.0",
   "description": "Microsoft botbuilder-lg support for Monaco Editor",
   "scripts": {

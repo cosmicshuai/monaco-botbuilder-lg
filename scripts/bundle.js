@@ -32,11 +32,11 @@ bundleOne('tsWorker');
 function bundleOne(moduleId, exclude) {
 	requirejs.optimize({
 		baseUrl: 'release/dev/',
-		name: 'vs/language/typescript/' + moduleId,
+		name: 'vs/language/botbuilder-lg/' + moduleId,
 		out: 'release/min/' + moduleId + '.js',
 		exclude: exclude,
 		paths: {
-			'vs/language/typescript': REPO_ROOT + '/release/dev'
+			'vs/language/botbuilder-lg': REPO_ROOT + '/release/dev'
 		},
 		optimize: 'none'
 	}, function(buildResponse) {
