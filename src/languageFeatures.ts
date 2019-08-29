@@ -6,7 +6,7 @@
 
 import { LanguageServiceDefaultsImpl } from './monaco.contribution';
 import * as ts from './lgService';
-import { LGWorker } from './tsWorker';
+import { LGWorker } from './lgWorker';
 
 import Uri = monaco.Uri;
 import Position = monaco.Position;

@@ -4,12 +4,9 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import * as mode from './tsMode';
-//import { typescriptVersion } from './lib/typescriptServicesMetadata'; // do not import the whole typescriptServices here
-
+import * as mode from './lgMode';
 import Emitter = monaco.Emitter;
 import IEvent = monaco.IEvent;
-import IDisposable = monaco.IDisposable;
 
 // --- TypeScript configuration and defaults ---------
 
@@ -22,7 +19,6 @@ export interface IExtraLib {
 export class LanguageServiceDefaultsImpl {
 
 	private _onDidChange = new Emitter<void>();
-	private _onDidExtraLibsChange = new Emitter<void>();
 
 	private _workerMaxIdleTime: number;
 	private _eagerModelSync: boolean;
@@ -60,7 +56,7 @@ const LGDefaults = new LanguageServiceDefaultsImpl();
 
 // --- Registration to monaco editor ---
 function getMode(): Promise<typeof mode> {
-	return import('./tsMode');
+	return import('./lgMode');
 }
 monaco.languages.register({ id: 'botbuilderlg' });
 

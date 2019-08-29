@@ -5,7 +5,7 @@
 'use strict';
 
 import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker';
-import { LGWorker } from './tsWorker';
+import { LGWorker } from './lgWorker';
 
 self.onmessage = () => {
 	// ignore the first message

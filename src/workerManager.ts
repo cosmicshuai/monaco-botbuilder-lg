@@ -5,7 +5,7 @@
 'use strict';
 
 import { LanguageServiceDefaultsImpl } from './monaco.contribution';
-import { LGWorker } from './tsWorker';
+import { LGWorker } from './lgWorker';
 
 import IDisposable = monaco.IDisposable;
 import Uri = monaco.Uri;
@@ -62,7 +62,7 @@ export class WorkerManager {
 		if (!this._client) {
 			this._worker = monaco.editor.createWebWorker<LGWorker>({
 				// module that exports the create() method and returns a `LGWorker` instance
-				moduleId: 'vs/language/botbuilder-lg/tsWorker',
+				moduleId: 'vs/language/botbuilder-lg/lgWorker',
 				label: this._modeId,
 			});
 

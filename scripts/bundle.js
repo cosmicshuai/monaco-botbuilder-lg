@@ -26,8 +26,8 @@ const BUNDLED_FILE_HEADER = [
 ].join('\n');
 
 bundleOne('monaco.contribution');
-bundleOne('tsMode');
-bundleOne('tsWorker');
+bundleOne('lgMode');
+bundleOne('lgWorker');
 
 function bundleOne(moduleId, exclude) {
 	requirejs.optimize({
