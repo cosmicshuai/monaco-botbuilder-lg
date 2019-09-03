@@ -37,9 +37,44 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 		return client.getLanguageServiceWorker(...[first].concat(more));
 	};
 
+	monaco.languages.setMonarchTokensProvider('botbuilderlg', {
+		tokenizer: {
+			root: [
+			  //keywords
+			  [/(IF|ELSE|ELSEIF|SWITCH|CASE|DEFAULT|if|else|elseif|switch|case|default)\s*/, {token: 'keywords'}],
+	
+			  // template name line
+			  [/^\s*#[\s\S]+/,  'template-name'],
+	  
+			  // template body
+			  [/^\s*-/, 'template-body'],
+	  
+			  //expression
+			  [/\{[\s\S]+?}/,  'expression'],
+	  
+			  //fence block
+			  [/^`{3}.+`{3}$/,'fence-block'],
+	  
+			  //inline string
+			  [/(\").+?(\")/,  'inline-string'],
+	  
+			  //template-ref 
+			  [/\[(.*?)(\(.*?(\[.+\])?\))?\]/,  'template-ref'],
+	  
+			  //parameters
+			  [/\([\s\S]*?\)\s*/,  'parameters'],
+	  
+			  // import statement in lg
+			  [/\[.*\]/, 'imports'],
+	  
+			  [/^\s*>[\s\S]*/, 'comments']
+			]}
+	});
+	
+	// Define a new theme that contains only rules that match this language
 	monaco.languages.registerCompletionItemProvider(modeId, new languageFeatures.SuggestAdapter(worker));
 	// monaco.languages.registerSignatureHelpProvider(modeId, new languageFeatures.SignatureHelpAdapter(worker));
-	// monaco.languages.registerHoverProvider(modeId, new languageFeatures.QuickInfoAdapter(worker));
+	monaco.languages.registerHoverProvider(modeId, new languageFeatures.QuickInfoAdapter(worker));
 	// monaco.languages.registerDocumentHighlightProvider(modeId, new languageFeatures.OccurrencesAdapter(worker));
 	// monaco.languages.registerDefinitionProvider(modeId, new languageFeatures.DefinitionAdapter(worker));
 	// monaco.languages.registerReferenceProvider(modeId, new languageFeatures.ReferenceAdapter(worker));

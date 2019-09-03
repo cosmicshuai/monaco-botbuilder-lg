@@ -13,7 +13,7 @@
 <script>
 	var paths = {
 		'vs/basic-languages': '../node_modules/monaco-languages/release/dev',
-		'vs/language/typescript': '../release/dev',
+		'vs/language/botbuilder-lg': '../release/dev',
 		'vs': '../node_modules/monaco-editor-core/dev/vs'
 	};
 	if (document.location.protocol === 'http:') {
@@ -21,7 +21,7 @@
 		let testIndex = document.location.pathname.indexOf('/test/');
 		if (testIndex !== -1) {
 			let prefix = document.location.pathname.substr(0, testIndex);
-			paths['vs/language/typescript'] = prefix + '/release/dev';
+			paths['vs/language/botbuilder-lg'] = prefix + '/release/dev';
 		}
 	}
 	var require = {
@@ -35,12 +35,16 @@
 <script>
 	require([
 		'vs/basic-languages/monaco.contribution',
-		'vs/language/typescript/monaco.contribution'
+		'vs/language/botbuilder-lg/monaco.contribution'
 	], function() {
 		var editor = monaco.editor.create(document.getElementById('container'), {
 			value: [
-				'#template2'
+				'#template2',
+				'-hello',
+				'#template3',
+				'- great'
 			].join('\n'),
+			theme: "lgtheme",
 			language: 'botbuilderlg'
 		});
 	});

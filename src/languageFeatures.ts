@@ -7,6 +7,8 @@
 import { LanguageServiceDefaultsImpl } from './monaco.contribution';
 import * as ts from './lgService';
 import { LGWorker } from './lgWorker';
+import * as util from './util';
+import {LGTemplate, TemplateEngine, ImportResolver} from './lib/LGBundle';
 
 import Uri = monaco.Uri;
 import Position = monaco.Position;
@@ -14,6 +16,7 @@ import Range = monaco.Range;
 import Thenable = monaco.Thenable;
 import CancellationToken = monaco.CancellationToken;
 import IDisposable = monaco.IDisposable;
+import {buildInfunctionsMap} from './builtinFunctions'
 
 //#region utils copied from typescript to prevent loading the entire typescriptServices ---
 
@@ -205,7 +208,6 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
 		const wordInfo = model.getWordUntilPosition(position);
 		const wordRange = new Range(position.lineNumber, wordInfo.startColumn, position.lineNumber, wordInfo.endColumn);
 		const resource = model.uri;
-		const offset = this._positionToOffset(resource, position);
 
 		return this._worker(resource).then(() => {
 			let suggestions: monaco.languages.CompletionItem[] = [{
@@ -258,354 +260,53 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
 				].join('\n'),
 				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 				documentation: 'Switch case Statement'
-			},
-			{
-				label: 'add',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'add(${1:number}, ${2:number})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Return the result from adding two numbers.'
-			},
-			{
-				label: 'div',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'div(${1:number}, ${2:number})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Return the integer result from dividing two numbers.'
-			},
-			{
-				label: 'mod',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'mod(${1:number}, ${2:number})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Return the remainder from dividing two numbers.'
-			},
-			{
-				label: 'mul',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'mul(${1:number}, ${2:number})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Return the product from multiplying two numbers.'
-			},
-			{
-				label: 'sub',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'sub(${1:number}, ${2:number})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Return the result from subtracting the second number from the first number.'
-			},
-			{
-				label: 'exp',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'exp(${1:number}, ${2:number})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Return the result from subtracting the second number from the first number.'
-			},
-			{
-				label: 'concat',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'concat(${1: string[]})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Combine two or more strings and return the resulting string. E.g. concat(‘hello’, ‘world’, ‘…’)'
-			},
-			{
-				label: 'not',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'not(${1: expression})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Check whether an expression is false. Return true when the expression is false, or return false when true.'
-			},
-			{
-				label: 'and',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'and(${1: any[]})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Check whether all expressions are true. Return true when all expressions are true, or return false when at least one expression is false.'
-			},
-			{
-				label: 'or',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'or(${1: any[]})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Check whether at least one expression is true. Return true when at least one expression is true, or return false when all are false.'
-			},
-			{
-				label: 'equals',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'equals(${1: any}, ${2: any})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Comparison equal. Returns true if specified values are equal'
-			},
-			{
-				label: 'greater',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'greater(${1: any}, ${2: any})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Check whether the first value is greater than the second value. Return true when the first value is more, or return false when less.'
-			},
-			{
-				label: 'greaterOrEquals',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'greaterOrEquals(${1: any}, ${2: any})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Check whether the first value is greater than or equal to the second value. Return true when the first value is greater or equal, or return false when the first value is less.'
-			},
-			{
-				label: 'less',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'less(${1: any}, ${2: any})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Check whether the first value is less than the second value. Return true when the first value is less, or return false when the first value is more.'
-			},
-			{
-				label: 'lessOrEquals',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'lessOrEquals(${1: any}, ${2: any})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Check whether the first value is less than or equal to the second value. Return true when the first value is less than or equal, or return false when the first value is more.'
-			},
-			{
-				label: 'join',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'join(${1: Array}, ${2: string})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Return a string that has all the items from an array and has each character separated by a delimiter.'
-			},
-			{
-				label: 'first',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'first(${1: Array|string})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Returns the first item from the collection'
-			},
-			{
-				label: 'last',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'last(${1: Array|string})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Returns the last item from the collection'
-			},
-			{
-				label: 'foreach',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'foreach(${1: Array}, ${2: string}, ${3: function})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Operate on each element and return the new collection'
-			},
-			{
-				label: 'empty',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'empty(${1: Array})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Check if the collection is empty'
-			},
-			{
-				label: 'newGuid',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'newGuid()',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Return new guid string'
-			},
-			{
-				label: 'min',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'min(${1: number[]})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Returns the smallest value from a collection'
-			},
-			{
-				label: 'max',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'max(${1: number[]})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Returns the largest value from a collection'
-			},
-			{
-				label: 'average',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'average(${1: number[]})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Returns the average value from a collection'
-			},
-			{
-				label: 'sum',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'sum(${1: number[]})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Return the result from adding numbers in a list.'
-			},
-			{
-				label: 'exists',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'exists(${1: expression})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Evaluates an expression for truthiness.'
-			},
-			{
-				label: 'length',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'length(${1: string})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Returns the length of a string.'
-			},
-			{
-				label: 'replace',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'replace(${1: string},${2: string}, ${3: string})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Replace a substring with the specified string, and return the updated string. case sensitive'
-			},
-			{
-				label: 'replaceIgnoreCase',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'replaceIgnoreCase(${1: string},${2: string}, ${3: string})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Replace a substring with the specified string, and return the updated string. case in-sensitive'
-			},
-			{
-				label: 'split',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'split(${1: string},${2: string})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Returns an array that contains substrings based on the delimiter specified.'
-			},
-			{
-				label: 'substring',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'substring(${1: string},${2: number}, ${3: number})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Returns characters from a string. Substring(sourceString, startPos, endPos). startPos cannot be less than 0. endPos greater than source strings length will be taken as the max length of the string'
-			},
-			{
-				label: 'toLower',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'toLower(${1: string})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Convert a string to all lower case characters'
-			},
-			{
-				label: 'toUpper',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'toUpper(${1: string})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Convert a string to all upper case characters'
-			},
-			{
-				label: 'trim',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'trim(${1: string})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Remove leading and trailing white spaces from a string'
-			},
-			{
-				label: 'count',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'count(${1: string|Array})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Returns the number of items in the collection'
-			},
-			{
-				label: 'contains',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'contains(${1: string|Array|Map}, ${2: stirng|object})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Works to find an item in a string or to find an item in an array or to find a parameter in a complex object. E.g. contains(‘hello world, ‘hello); contains([‘1’, ‘2’], ‘1’); contains({“foo”:”bar”}, “foo”)'
-			},
-			{
-				label: 'float',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'float(${1: string})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Return floating point representation of the specified string or the string itself if conversion is not possible'
-			},
-			{
-				label: 'int',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'int(${1: string})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Return integer representation of the specified string or the string itself if conversion is not possible.'
-			},
-			{
-				label: 'string',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'string(${1: any})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Return string version of the specified value.'
-			},
-			{
-				label: 'bool',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'bool(${1: any})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Return Boolean representation of the specified object. Bool(‘true’), bool(1)'
-			},
-			{
-				label: 'createArray',
-				kind: monaco.languages.CompletionItemKind.Function,
-				range: wordRange,
-				insertText: 'createArray(${1: any[]})',
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation:  'Create an array from multiple inputs'
-			},
-		]
-			//let suggestions: MyCompletionItem[] = info.entries.map(entry => {
-			// 	let range = wordRange;
-			// 	if (entry.replacementSpan) {
-			// 		const p1 = model.getPositionAt(entry.replacementSpan.start);
-			// 		const p2 = model.getPositionAt(entry.replacementSpan.start + entry.replacementSpan.length);
-			// 		range = new Range(p1.lineNumber, p1.column, p2.lineNumber, p2.column);
-			// 	}
+			}];
 
-			// 	return {
-			// 		uri: resource,
-			// 		position: position,
-			// 		range: range,
-			// 		label: entry.name,
-			// 		insertText: entry.name,
-			// 		sortText: entry.sortText,
-			// 		kind: SuggestAdapter.convertKind(entry.kind)
-			// 	};
-			// });
+			let functions = buildInfunctionsMap;
+			functions.forEach((value, key) => {
+				let item = {
+					label: key,
+					kind: monaco.languages.CompletionItemKind.Function,
+					range: wordRange,
+					//TODO: a little more to do to make completion more concrete
+					insertText: key+ '(' + value.Params.toString() + ')', 
+					insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+					documentation: value.Introduction
+				};
+				suggestions.push(item);
+			});
+
+			const contents = model.getValue();
+			const engine  = new TemplateEngine();
+			try{
+				engine.addText(contents, '', new ImportResolver());
+			}
+			catch {
+				// ignore
+			}
+			
+			const templates: LGTemplate[] = engine.templates;
+			if (templates && templates.length > 0 ){
+				templates.forEach(template => {
+					let item = {
+						label: template.Name,
+						kind: monaco.languages.CompletionItemKind.Reference,
+						range: wordRange,
+						insertText: template.Parameters.length > 0? template.Name+ '(' + template.Parameters.join(", ") + ')' : template.Name, 
+						insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+						documentation: template.Body
+					};
+					suggestions.push(item);
+				});
+			}
+			// {
+			// 	label: 'add',
+			// 	kind: monaco.languages.CompletionItemKind.Function,
+			// 	range: wordRange,
+			// 	insertText: 'add(${1:number}, ${2:number})',
+			// 	insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			// 	documentation: 'Return the result from adding two numbers.'
+			// }
 
 			return {
 				suggestions
@@ -665,38 +366,77 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
 
 // --- hover ------
 
-// export class QuickInfoAdapter extends Adapter implements monaco.languages.HoverProvider {
+export class QuickInfoAdapter extends Adapter implements monaco.languages.HoverProvider {
 
-// 	provideHover(model: monaco.editor.IReadOnlyModel, position: Position, token: CancellationToken): Thenable<monaco.languages.Hover> {
-// 		let resource = model.uri;
+	provideHover(model: monaco.editor.IReadOnlyModel, position: Position, token: CancellationToken): Thenable<monaco.languages.Hover> {
+		let resource = model.uri;
 
-// 		return this._worker(resource).then(worker => {
-// 			return worker.getQuickInfoAtPosition(resource.toString(), this._positionToOffset(resource, position));
-// 		}).then(info => {
-// 			if (!info) {
-// 				return;
-// 			}
-// 			let documentation = displayPartsToString(info.documentation);
-// 			let tags = info.tags ? info.tags.map(tag => {
-// 				const label = `*@${tag.name}*`;
-// 				if (!tag.text) {
-// 					return label;
-// 				}
-// 				return label + (tag.text.match(/\r\n|\n/g) ? ' \n' + tag.text : ` - ${tag.text}`);
-// 			})
-// 				.join('  \n\n') : '';
-// 			let contents = displayPartsToString(info.displayParts);
-// 			return {
-// 				range: this._textSpanToRange(resource, info.textSpan),
-// 				contents: [{
-// 					value: '```js\n' + contents + '\n```\n'
-// 				}, {
-// 					value: documentation + (tags ? '\n\n' + tags : '')
-// 				}]
-// 			};
-// 		});
-// 	}
-// }
+		return this._worker(resource).then(worker => {
+			return model.getWordAtPosition(position)
+		}).then(wordInfo => {
+			if (!wordInfo) {
+				return;
+			}
+			let wordName = wordInfo.word;
+			if (wordName.indexOf('builtin.') == 0) {
+				wordName = wordName.substring('builtin.'.length);
+			}
+
+			if (buildInfunctionsMap.has(wordName)) {
+				let startPostion = {lineNumber: position.lineNumber, column: wordInfo.startColumn};
+				let endPostion = {lineNumber: position.lineNumber, column: wordInfo.endColumn};
+				let range =  monaco.Range.fromPositions(startPostion, endPostion);
+				const functionEntity = buildInfunctionsMap.get(wordName);
+				const returnType = util.GetreturnTypeStrFromReturnType(functionEntity.Returntype);
+				return {
+					range: range,
+					contents: [{
+						value: `${wordName}(${functionEntity.Params.join(", ")}): ${returnType}`
+					}, {
+						value: functionEntity.Introduction
+					}]
+				}
+			}
+
+			const contents = model.getValue();
+			const engine  = new TemplateEngine();
+			try{
+				engine.addText(contents, '', new ImportResolver());
+			}
+			catch {
+				// ignore
+			}
+			
+			const templates: LGTemplate[] = engine.templates;
+			const templateMap: Map<string,  LGTemplate> = new Map();
+			if (templates && templates.length > 0 ) {
+				templates.forEach(template => {
+					templateMap.set(template.Name, template);
+				})
+
+				if (templateMap.has(wordName)) {
+					let startPostion = {lineNumber: position.lineNumber, column: wordInfo.startColumn};
+					let endPostion = {lineNumber: position.lineNumber, column: wordInfo.endColumn};
+					let range =  monaco.Range.fromPositions(startPostion, endPostion);
+					const templateEntity = templateMap.get(wordName);
+					return {
+						range: range,
+						contents: [{
+							value: `${templateEntity.Name}${templateEntity.Parameters.length > 0?'(' + templateEntity.Parameters.join(", ") + ')' : ""}: ${templateEntity.Body}`
+						}, {
+							value: templateEntity.Source
+						}]
+					}
+				}
+			}
+
+
+
+
+			;
+		});
+	}
+}
 
 // // --- occurrences ------
 
