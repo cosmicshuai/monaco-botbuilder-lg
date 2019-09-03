@@ -34,14 +34,9 @@ export class LGWorker {
 		return '';
 	}
 
-	// // --- language features
-	// getQuickInfoAtPosition(fileName: string, position: number): Promise<ts.QuickInfo> {
-	// 	return Promise.resolve(this._languageService.getQuickInfoAtPosition(fileName, position));
-	// }
-
 
 	getLGDiagnostics(contents: string): Promise< ts.Diagnostic[]> {
-		const LGDiagnostics: lg.Diagnostic[] = lg.StaticChecker.checkText(contents);
+		const LGDiagnostics: lg.Diagnostic[] = lg.StaticChecker.checkText(contents);  
 		var diagnostics: ts.Diagnostic[] = [];
 		for (const diag of LGDiagnostics) {
 			let diagnostic: ts.Diagnostic = {
@@ -56,6 +51,10 @@ export class LGWorker {
 		}
         return Promise.resolve(diagnostics);
 	}
+
+	// getLGTempaltes(content: string): Promise<lg.LGTemplate[]> {
+		
+	// }
 }
 
 

@@ -59,7 +59,21 @@ function getMode(): Promise<typeof mode> {
 	return import('./lgMode');
 }
 monaco.languages.register({ id: 'botbuilderlg' });
-
+monaco.editor.defineTheme('lgtheme', {
+	base: 'vs',
+	inherit: false,
+	colors:{},
+	rules: [
+		{ token: 'template-name', foreground: '416DE7' },
+		{ token: 'fence-block', foreground: 'FB4C3E'},
+		{ token: 'expression', foreground: 'FBD53E', fontStyle: 'bold'  },
+		{ token: 'keywords', foreground: 'B44EBF' },
+		{ token : 'imports', foreground: 'FBD53E' },
+		{ token : 'comments', foreground: '9CAABF'},
+		{ token : 'parameters', foreground: '008800'},
+		{ token : 'inline-string', foreground: '429F34'},
+	]
+});
 monaco.languages.onLanguage('botbuilderlg', () => {
 	return getMode().then(mode => mode.setupLG(LGDefaults));
 });
