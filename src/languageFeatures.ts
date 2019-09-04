@@ -8,7 +8,7 @@ import { LanguageServiceDefaultsImpl } from './monaco.contribution';
 import * as ts from './lgService';
 import { LGWorker } from './lgWorker';
 import * as util from './util';
-import {LGTemplate, TemplateEngine, ImportResolver} from './lib/LGBundle';
+import {LGTemplate, TemplateEngine, ImportResolver} from './lib/LGbundle';
 
 import Uri = monaco.Uri;
 import Position = monaco.Position;
@@ -422,7 +422,7 @@ export class QuickInfoAdapter extends Adapter implements monaco.languages.HoverP
 					return {
 						range: range,
 						contents: [{
-							value: `${templateEntity.Name}${templateEntity.Parameters.length > 0?'(' + templateEntity.Parameters.join(", ") + ')' : ""}: ${templateEntity.Body}`
+							value: `${templateEntity.Name}${templateEntity.Parameters.length > 0 ?'(' + templateEntity.Parameters.join(", ") + ')' : ""}: ${templateEntity.Body}`
 						}, {
 							value: templateEntity.Source
 						}]
