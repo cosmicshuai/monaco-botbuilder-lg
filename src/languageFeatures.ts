@@ -215,11 +215,10 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
 				kind: monaco.languages.CompletionItemKind.Snippet,
 				range: wordRange,
 				insertText: [
-					'if (${1:condition}) {',
-					'\t$0',
-					'} else {',
-					'\t',
-					'}'
+					'- if (${1:condition}) {',
+					'- \t$0',
+					'- else:',
+					'-\t'
 				].join('\n'),
 				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 				documentation: 'If-Else Statement'
