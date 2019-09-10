@@ -555,53 +555,6 @@ export class QuickInfoAdapter extends Adapter implements monaco.languages.HoverP
 // 	}
 // }
 
-// export class Kind {
-// 	public static unknown: string = '';
-// 	public static keyword: string = 'keyword';
-// 	public static script: string = 'script';
-// 	public static module: string = 'module';
-// 	public static class: string = 'class';
-// 	public static interface: string = 'interface';
-// 	public static type: string = 'type';
-// 	public static enum: string = 'enum';
-// 	public static variable: string = 'var';
-// 	public static localVariable: string = 'local var';
-// 	public static function: string = 'function';
-// 	public static localFunction: string = 'local function';
-// 	public static memberFunction: string = 'method';
-// 	public static memberGetAccessor: string = 'getter';
-// 	public static memberSetAccessor: string = 'setter';
-// 	public static memberVariable: string = 'property';
-// 	public static constructorImplementation: string = 'constructor';
-// 	public static callSignature: string = 'call';
-// 	public static indexSignature: string = 'index';
-// 	public static constructSignature: string = 'construct';
-// 	public static parameter: string = 'parameter';
-// 	public static typeParameter: string = 'type parameter';
-// 	public static primitiveType: string = 'primitive type';
-// 	public static label: string = 'label';
-// 	public static alias: string = 'alias';
-// 	public static const: string = 'const';
-// 	public static let: string = 'let';
-// 	public static warning: string = 'warning';
-// }
-
-// let outlineTypeTable: { [kind: string]: monaco.languages.SymbolKind } = Object.create(null);
-// outlineTypeTable[Kind.module] = monaco.languages.SymbolKind.Module;
-// outlineTypeTable[Kind.class] = monaco.languages.SymbolKind.Class;
-// outlineTypeTable[Kind.enum] = monaco.languages.SymbolKind.Enum;
-// outlineTypeTable[Kind.interface] = monaco.languages.SymbolKind.Interface;
-// outlineTypeTable[Kind.memberFunction] = monaco.languages.SymbolKind.Method;
-// outlineTypeTable[Kind.memberVariable] = monaco.languages.SymbolKind.Property;
-// outlineTypeTable[Kind.memberGetAccessor] = monaco.languages.SymbolKind.Property;
-// outlineTypeTable[Kind.memberSetAccessor] = monaco.languages.SymbolKind.Property;
-// outlineTypeTable[Kind.variable] = monaco.languages.SymbolKind.Variable;
-// outlineTypeTable[Kind.const] = monaco.languages.SymbolKind.Variable;
-// outlineTypeTable[Kind.localVariable] = monaco.languages.SymbolKind.Variable;
-// outlineTypeTable[Kind.variable] = monaco.languages.SymbolKind.Variable;
-// outlineTypeTable[Kind.function] = monaco.languages.SymbolKind.Function;
-// outlineTypeTable[Kind.localFunction] = monaco.languages.SymbolKind.Function;
-
 // // --- formatting ----
 
 // export abstract class FormatHelper extends Adapter {
