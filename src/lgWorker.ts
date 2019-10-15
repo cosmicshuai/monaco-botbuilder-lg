@@ -20,41 +20,41 @@ export class LGWorker {
 	}
 
 	// --- language service host ---------------
-	private _getModel(fileName: string): monaco.worker.IMirrorModel {
-		let models = this._ctx.getMirrorModels();
-		for (let i = 0; i < models.length; i++) {
-			if (models[i].uri.toString() === fileName) {
-				return models[i];
-			}
-		}
-		return null;
-	}
-
 	getCurrentDirectory(): string {
 		return '';
 	}
 
+	private convertSeverity(severity: lg.DiagnosticSeverity): ts.DiagnosticCategory {
+		switch (severity) {
+		  case lg.DiagnosticSeverity.Error:
+			return ts.DiagnosticCategory.Error;
+		  case lg.DiagnosticSeverity.Hint:
+			return ts.DiagnosticCategory.Suggestion;
+		  case lg.DiagnosticSeverity.Information:
+			return ts.DiagnosticCategory.Message;
+		  case lg.DiagnosticSeverity.Warning:
+			return ts.DiagnosticCategory.Warning;
+		}
+	  }
 
 	getLGDiagnostics(contents: string): Promise< ts.Diagnostic[]> {
-		const LGDiagnostics: lg.Diagnostic[] = lg.StaticChecker.checkText(contents);  
+		const staticChercher = new lg.StaticChecker();
+		const LGDiagnostics: lg.Diagnostic[] = staticChercher.checkText(contents, '', lg.ImportResolver.fileResolver);
 		var diagnostics: ts.Diagnostic[] = [];
 		for (const diag of LGDiagnostics) {
 			let diagnostic: ts.Diagnostic = {
 				start: diag.Range.Start.Line,
 				startColumn: diag.Range.Start.Character,
+				end: diag.Range.End.Line,
 				endColumn: diag.Range.End.Character,
-				end: diag.Range.End.Character,
-				category: diag.Severity.valueOf(),
+				category: this.convertSeverity(diag.Severity),
 				messageText: diag.Message
 			}
+			
 			diagnostics.push(diagnostic);
 		}
         return Promise.resolve(diagnostics);
 	}
-
-	// getLGTempaltes(content: string): Promise<lg.LGTemplate[]> {
-		
-	// }
 }
 
 
