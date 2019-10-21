@@ -22,9 +22,5 @@
     "requirejs": "^2.3.6",
     "typescript": "^3.5.1",
     "uglify-js": "^3.4.9"
-  },
-  "dependencies": {
-    "monaco-botbuilder-lg": "https://github.com/cosmicshuai/monaco-botbuilder-lg/releases/download/0.1.1/monaco-botbuilder-lg-0.1.1.tgz",
-    "monaco-typescript": "^3.5.0"
   }
 }
