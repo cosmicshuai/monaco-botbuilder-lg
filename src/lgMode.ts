@@ -70,8 +70,10 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			  
 			  //expression
 			  [/\{/,  {token: 'expression', next: '@expression'}],
+        
+			  //parameters
+			  [/\(/,  {token: 'parameters', next: '@parameters'}],
 
-			],
 
 			fence_block: [
 				[/`{3}\s*$/, 'fence-block', '@pop'],
@@ -88,8 +90,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			expression: [
 				[/}/, 'expression', '@pop'],
 				[/\(/, {token : 'parameters', next: '@parameters'}],
-				[/./, 'expression.content']
-				
+				[/./, 'expression.content']	
 			],
 
 			parameters: [
