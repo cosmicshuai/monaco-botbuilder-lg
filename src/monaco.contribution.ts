@@ -65,13 +65,14 @@ monaco.editor.defineTheme('lgtheme', {
 	colors:{},
 	rules: [
 		{ token: 'template-name', foreground: '416DE7' },
-		{ token: 'fence-block', foreground: 'FB4C3E'},
-		{ token: 'expression', foreground: 'D822FF', fontStyle: 'bold'  },
+		{ token: 'fence-block.content', fontStyle: 'bold'},
+		{ token: 'expression.content', foreground: 'D822FF'  },
 		{ token: 'keywords', foreground: 'B44EBF' },
-		{ token : 'template-ref', foreground: '66D274' },
-		{ token : 'comments', foreground: '9CAABF'},
-		{ token : 'parameters', foreground: '008800'},
-		{ token : 'inline-string', foreground: '00EA00'},
+		{ token: 'template-ref', foreground: '66D274' },
+		{ token: 'comments', foreground: '9CAABF'},
+		{ token: 'parameters', foreground: '008800', fontStyle: 'italic'},
+		{ token: 'inline-string.content', foreground: '00EA00'},
+		{ token: 'structure-name', foreground: 'FF9788', fontStyle: 'italic' },
 	]
 });
 monaco.languages.onLanguage('botbuilderlg', () => {

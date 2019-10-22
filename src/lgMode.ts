@@ -38,49 +38,84 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 	};
 
 	monaco.languages.setMonarchTokensProvider('botbuilderlg', {
+		ignoreCase: true,
 		tokenizer: {
 			root: [
 			  //keywords
-			  [/(IF|ELSE|ELSEIF|SWITCH|CASE|DEFAULT|if|else|elseif|switch|case|default)\s*/, {token: 'keywords'}],
+			  [/(if|else|else\s*if|switch|case|default)\s*:/, {token: 'keywords'}],
 	
 			  // template name line
-			  [/^\s*#[\s\S]+/,  'template-name'],
+			  [/^\s*#[\s\S]+\s*$/,  'template-name'],
 	  
 			  // template body
 			  [/^\s*-/, 'template-body'],
-	  
-			  //expression
-			  [/\{[\s\S]+?}/,  'expression'],
+			
+			  //comments
+			  [/^\s*>[\s\S]*/, 'comments'],
 	  
 			  //fence block
-			  [/^`{3}.+`{3}$/,'fence-block'],
-	  
+			  [/^\s*`{3}/, {token: 'fence-block', next: '@fence_block'}],
+			  
 			  //inline string
-			  [/(\").+?(\")/,  'inline-string'],
+			  [/^\s*\"/,  {token: 'inline-string', next: '@inline_string'}],
 	  
 			  //template-ref 
 			  [/\[(.*?)(\(.*?(\[.+\])?\))?\]/,  'template-ref'],
 	  
-			  //parameters
-			  [/\([\s\S]*?\)\s*/,  'parameters'],
-	  
 			  // import statement in lg
 			  [/\[.*\]/, 'imports'],
 	  
-			  [/^\s*>[\s\S]*/, 'comments']
-			]}
+			  // structure_lg
+			  [/^\s*\[/, {token: 'structure-lg', next:'@structure_lg'}], 
+			  
+			  //expression
+			  [/\{/,  {token: 'expression', next: '@expression'}],
+
+			  //expression
+			  [/\(/,  {token: 'parameters', next: '@parameters'}],
+			],
+
+			fence_block: [
+				[/`{3}\s*$/, 'fence-block', '@pop'],
+				[/\([\s\S]*?\)\s*/,  {token: 'parameters'}],
+				[/\{[\s\S]+?}/,  {token: 'expression'}],
+				[/./, 'fence-block.content']
+				
+			], 
+
+			inline_string: [
+				[/\"\s*$/, 'inline-string', '@pop'],
+				[/\([\s\S]*?\)\s*/,  {token: 'parameters'}],
+				[/\{[\s\S]+?}/,  {token: 'expression'}],
+				[/./, 'inline-string.content']
+				
+				
+			], 
+
+			expression: [
+				[/}/, 'expression', '@pop'],
+				[/\([\s\S]*?\)\s*/,  {token: 'parameters'}],
+				[/./, 'expression.content']
+				
+			],
+
+			parameters: [
+				[/\)/, 'parameters', '@pop'],
+				[/./, 'parameters.content']
+			],
+
+			structure_lg: [
+			[/^\]\s*$/, 'structure-lg', '@pop'],
+			[/([a-zA-Z0-9_]+\s*)=([\s\S]+)/, 'structure-expression'],
+			[/\s*[a-zA-Z0-9_]\s*/, {token: 'structure-name'}]
+			
+			]
+		}
 	});
 	
 	// Define a new theme that contains only rules that match this language
 	monaco.languages.registerCompletionItemProvider(modeId, new languageFeatures.SuggestAdapter(worker));
-	// monaco.languages.registerSignatureHelpProvider(modeId, new languageFeatures.SignatureHelpAdapter(worker));
 	monaco.languages.registerHoverProvider(modeId, new languageFeatures.QuickInfoAdapter(worker));
-	// monaco.languages.registerDocumentHighlightProvider(modeId, new languageFeatures.OccurrencesAdapter(worker));
-	// monaco.languages.registerDefinitionProvider(modeId, new languageFeatures.DefinitionAdapter(worker));
-	// monaco.languages.registerReferenceProvider(modeId, new languageFeatures.ReferenceAdapter(worker));
-	// monaco.languages.registerDocumentSymbolProvider(modeId, new languageFeatures.OutlineAdapter(worker));
-	// monaco.languages.registerDocumentRangeFormattingEditProvider(modeId, new languageFeatures.FormatAdapter(worker));
-	// monaco.languages.registerOnTypeFormattingEditProvider(modeId, new languageFeatures.FormatOnTypeAdapter(worker));
 	new languageFeatures.DiagnostcsAdapter(defaults, modeId, worker);
 	return worker;
 }
