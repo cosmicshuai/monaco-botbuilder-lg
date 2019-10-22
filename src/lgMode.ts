@@ -70,37 +70,32 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			  
 			  //expression
 			  [/\{/,  {token: 'expression', next: '@expression'}],
-
-			  //expression
+        
+			  //parameters
 			  [/\(/,  {token: 'parameters', next: '@parameters'}],
-			],
+
 
 			fence_block: [
 				[/`{3}\s*$/, 'fence-block', '@pop'],
-				[/\([\s\S]*?\)\s*/,  {token: 'parameters'}],
-				[/\{[\s\S]+?}/,  {token: 'expression'}],
+				[/\{/, {token: 'expression', next: '@expression'}],
 				[/./, 'fence-block.content']
-				
 			], 
 
 			inline_string: [
 				[/\"\s*$/, 'inline-string', '@pop'],
-				[/\([\s\S]*?\)\s*/,  {token: 'parameters'}],
-				[/\{[\s\S]+?}/,  {token: 'expression'}],
+				[/\{/, {token : 'expression', next: '@expression'}],
 				[/./, 'inline-string.content']
-				
-				
 			], 
 
 			expression: [
 				[/}/, 'expression', '@pop'],
-				[/\([\s\S]*?\)\s*/,  {token: 'parameters'}],
-				[/./, 'expression.content']
-				
+				[/\(/, {token : 'parameters', next: '@parameters'}],
+				[/./, 'expression.content']	
 			],
 
 			parameters: [
 				[/\)/, 'parameters', '@pop'],
+				[/\{/, {token : 'expression', next: '@expression'}],
 				[/./, 'parameters.content']
 			],
 
