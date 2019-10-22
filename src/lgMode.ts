@@ -54,7 +54,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			  [/^\s*>[\s\S]*/, 'comments'],
 	  
 			  //fence block
-			  [/^\s*`{3}/, {token: 'fence-block', next: '@fence_block'}],
+			  [/`{3}/, {token: 'fence-block', next: '@fence_block'}],
 			  
 			  //inline string
 			  [/^\s*\"/,  {token: 'inline-string', next: '@inline_string'}],
@@ -73,8 +73,8 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
         
 			  //parameters
 			  [/\(/,  {token: 'parameters', next: '@parameters'}],
-
-
+			],
+			
 			fence_block: [
 				[/`{3}\s*$/, 'fence-block', '@pop'],
 				[/\{/, {token: 'expression', next: '@expression'}],
