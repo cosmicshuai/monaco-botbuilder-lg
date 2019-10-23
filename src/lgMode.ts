@@ -103,7 +103,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			structure_lg: [
 				[/^\s*\]\s*$/, 'structure-lg', '@pop'],
 				[/^\s*>[\s\S]*$/,  'comments'],
-				[/(=|\|)[a_zA-Z0-9_ ]*\{/, { token: 'expression', next: '@expression' }],
+				[/(=|\|)([a_zA-Z0-9@ ]|\@)*\{/, { token: 'expression', next: '@expression' }],
 				[/^\s*\{/, { token: 'expression', next: '@expression' }],
 				[/=\s*[\s\S]+\s*$/, { token: 'structure-property' }],
 				[/\s*[a-zA-Z0-9_ ]+\s*$/, { token: 'structure-name' }],
