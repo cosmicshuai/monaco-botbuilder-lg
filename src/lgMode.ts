@@ -46,7 +46,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				// template body
 				[/^\s*-/, { token: 'template-body-identifier', next: '@teamplate_body' }],
 				//comments
-				[/^\s*>/, { token: 'comments', next: 'comments' }],
+				[/^\s*>/, { token: 'comments', next: '@comments' }],
 				// import statement in lg
 				[/\[.*\]/, 'imports'],
 				//inline string
@@ -59,7 +59,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			],
 			template_name: [
 				//comments
-				[/^\s*>/, { token: 'comments', next: 'comments'}],
+				[/^\s*>/, { token: 'comments', next: '@comments'}],
 				//template_body
 				[/^\s*-/, { token: 'template-body-identifier', next: '@teamplate_body' }],
 				// structure_lg
@@ -71,7 +71,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				//pop 
 				[/[/s/S]*$/, '@pop'],
 				//comments
-				[/^\s*>/, { token: 'comments', next: 'comments' }],
+				[/^\s*>/, { token: 'comments', next: '@comments' }],
 				//template name
 				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
 				//template_body
@@ -81,7 +81,15 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				//template-ref 
 				[/\[(.*?)(\(.*?(\[.+\])?\))?\]/, 'template-ref'],
 				//expression
-				[/\{/, { token: 'expression', next: '@expression' }]
+				[/\{/, { token: 'expression', next: '@expression' }],
+				//non-elseif
+				[/[\s\S]*([\S]+\s*(else\s*if))[\s\S]*$/,'non-keyword'],
+				//else if keywords
+				[/\s*(else\s*if)\s*:/,'keywords'],
+				//non-keywords
+				[/[\s\S]*([\S]+\s*(if|else|switch|case|default))[\s\S]*$/, {token:'non-keyword', log: 'found number $0 in state $S0'}],
+				//keywords
+				[/\s*(if|else|elseif|switch|case|default)\s*:/,'keywords']
 			],
 			fence_block: [
 				[/`{3}\s*$/, 'fence-block', '@pop'],
