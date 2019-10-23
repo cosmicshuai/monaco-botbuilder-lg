@@ -41,69 +41,76 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 		ignoreCase: true,
 		tokenizer: {
 			root: [
-			  //keywords
-			  [/(if|else|else\s*if|switch|case|default)\s*:/, {token: 'keywords'}],
-	
-			  // template name line
-			  [/^\s*#[\s\S]+\s*$/,  'template-name'],
-	  
-			  // template body
-			  [/^\s*-/, 'template-body'],
-			
-			  //comments
-			  [/^\s*>[\s\S]*/, 'comments'],
-	  
-			  //fence block
-			  [/`{3}/, {token: 'fence-block', next: '@fence_block'}],
-			  
-			  //inline string
-			  [/^\s*\"/,  {token: 'inline-string', next: '@inline_string'}],
-	  
-			  //template-ref 
-			  [/\[(.*?)(\(.*?(\[.+\])?\))?\]/,  'template-ref'],
-	  
-			  // import statement in lg
-			  [/\[.*\]/, 'imports'],
-	  
-			  // structure_lg
-			  [/^\s*\[/, {token: 'structure-lg', next:'@structure_lg'}], 
-			  
-			  //expression
-			  [/\{/,  {token: 'expression', next: '@expression'}],
-        
-			  //parameters
-			  [/\(/,  {token: 'parameters', next: '@parameters'}],
+				// template name line
+				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
+				// template body
+				[/^\s*-/, { token: 'template-body-identifier', next: '@teamplate_body' }],
+				//comments
+				[/^\s*>/, { token: 'comments', next: 'comments' }],
+				// import statement in lg
+				[/\[.*\]/, 'imports'],
+				//inline string
+				[/^\s*\"/, { token: 'inline-string', next: '@inline_string' }],
 			],
-			
+			comments: [
+				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
+				[/^\s*-/, { token: 'template-body-identifier', next: '@teamplate_body' }],
+				[/./, 'comments']
+			],
+			template_name: [
+				//comments
+				[/^\s*>/, { token: 'comments', next: 'comments' }],
+				//template_body
+				[/^\s*-/, { token: 'template-body-identifier', next: '@teamplate_body' }],
+				// structure_lg
+				[/^\s*\[/, { token: 'structure-lg', next: '@structure_lg' }],
+				//default content
+				[/./, 'template-name.content']
+			],
+			teamplate_body: [
+				//comments
+				[/^\s*>/, { token: 'comments', next: 'comments' }],
+				//fence block
+				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
+				//fence block
+				[/`{3}/, { token: 'fence-block', next: '@fence_block' }],
+				//template-ref 
+				[/\[(.*?)(\(.*?(\[.+\])?\))?\]/, 'template-ref'],
+				//expression
+				[/\{/, { token: 'expression', next: '@expression' }],
+				{ include: '@keywords' },
+			],
 			fence_block: [
 				[/`{3}\s*$/, 'fence-block', '@pop'],
-				[/\{/, {token: 'expression', next: '@expression'}],
+				[/\{/, { token: 'expression', next: '@expression' }],
 				[/./, 'fence-block.content']
-			], 
-
+			],
 			inline_string: [
 				[/\"\s*$/, 'inline-string', '@pop'],
-				[/\{/, {token : 'expression', next: '@expression'}],
+				[/\{/, { token: 'expression', next: '@expression' }],
 				[/./, 'inline-string.content']
-			], 
-
+			],
 			expression: [
 				[/}/, 'expression', '@pop'],
-				[/\(/, {token : 'parameters', next: '@parameters'}],
-				[/./, 'expression.content']	
+				[/\(/, { token: 'parameters', next: '@parameters' }],
+				[/[^\),]/, 'expression.content']
 			],
-
 			parameters: [
 				[/\)/, 'parameters', '@pop'],
-				[/\{/, {token : 'expression', next: '@expression'}],
-				[/./, 'parameters.content']
+				[/\{/, { token: 'expression', next: '@expression' }],
+				[/[^\},]/, 'parameters.content']
 			],
-
 			structure_lg: [
-			[/^\]\s*$/, 'structure-lg', '@pop'],
-			[/([a-zA-Z0-9_]+\s*)=([\s\S]+)/, 'structure-expression'],
-			[/\s*[a-zA-Z0-9_]\s*/, {token: 'structure-name'}]
-			
+				[/^\s*\]\s*$/, 'structure-lg', '@pop'],
+				[/^\s*>[\s\S]*$/,  'comments'],
+				[/(=|\|)[a_zA-Z0-9_ ]*\{/, { token: 'expression', next: '@expression' }],
+				[/^\s*\{/, { token: 'expression', next: '@expression' }],
+				[/=\s*[\s\S]+\s*$/, { token: 'structure-property' }],
+				[/\s*[a-zA-Z0-9_ ]+\s*$/, { token: 'structure-name' }],
+				[/./, 'structure-lg.content']
+			],
+			keywords: [
+				[/(if|else|else\s*if|switch|case|default)s*:/, 'keywords']
 			]
 		}
 	});
