@@ -59,7 +59,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			],
 			template_name: [
 				//comments
-				[/^\s*>/, { token: 'comments', next: 'comments' }],
+				[/^\s*>/, { token: 'comments', next: 'comments'}],
 				//template_body
 				[/^\s*-/, { token: 'template-body-identifier', next: '@teamplate_body' }],
 				// structure_lg
@@ -68,17 +68,20 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				[/./, 'template-name.content']
 			],
 			teamplate_body: [
+				//pop 
+				[/[/s/S]*$/, '@pop'],
 				//comments
 				[/^\s*>/, { token: 'comments', next: 'comments' }],
-				//fence block
+				//template name
 				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
+				//template_body
+				[/^\s*-/, { token: 'template-body-identifier', next: '@teamplate_body' }],
 				//fence block
 				[/`{3}/, { token: 'fence-block', next: '@fence_block' }],
 				//template-ref 
 				[/\[(.*?)(\(.*?(\[.+\])?\))?\]/, 'template-ref'],
 				//expression
-				[/\{/, { token: 'expression', next: '@expression' }],
-				{ include: '@keywords' },
+				[/\{/, { token: 'expression', next: '@expression' }]
 			],
 			fence_block: [
 				[/`{3}\s*$/, 'fence-block', '@pop'],
@@ -109,9 +112,9 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				[/\s*[a-zA-Z0-9_ ]+\s*$/, { token: 'structure-name' }],
 				[/./, 'structure-lg.content']
 			],
-			keywords: [
-				[/(if|else|else\s*if|switch|case|default)s*:/, 'keywords']
-			]
+			// keywords: [
+			// 	[/(if|else|else\s*if|switch|case|default)s*:/, 'keywords']
+			// ]
 		}
 	});
 	
