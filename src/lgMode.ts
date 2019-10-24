@@ -44,7 +44,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				// template name line
 				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
 				// template body
-				[/^\s*-/, { token: 'template-body-identifier', next: '@teamplate_body' }],
+				[/^\s*-/, { token: 'template-body-identifier', goBack: 1, next: '@teamplate_body'}],
 				//comments
 				[/^\s*>/, { token: 'comments', next: '@comments' }],
 				// import statement in lg
@@ -61,7 +61,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				//comments
 				[/^\s*>/, { token: 'comments', next: '@comments'}],
 				//template_body
-				[/^\s*-/, { token: 'template-body-identifier', next: '@teamplate_body' }],
+				[/^\s*-/, { token: 'template-body-identifier', goBack: 1, next: '@teamplate_body' }],
 				// structure_lg
 				[/^\s*\[/, { token: 'structure-lg', next: '@structure_lg' }],
 				//default content
@@ -74,6 +74,8 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				[/^\s*>/, { token: 'comments', next: '@comments' }],
 				//template name
 				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
+				//keywords
+				[/(-\s*)(if|else|else\s*if|switch|case|default)(\s*:)/,['identifier', 'keywords', 'colon']],
 				//template_body
 				[/^\s*-/, { token: 'template-body-identifier', next: '@teamplate_body' }],
 				//fence block
@@ -82,14 +84,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				[/\[(.*?)(\(.*?(\[.+\])?\))?\]/, 'template-ref'],
 				//expression
 				[/\{/, { token: 'expression', next: '@expression' }],
-				//non-elseif
-				[/[\s\S]*([\S]+\s*(else\s*if))[\s\S]*$/,'non-keyword'],
-				//else if keywords
-				[/\s*(else\s*if)\s*:/,'keywords'],
-				//non-keywords
-				[/[\s\S]*([\S]+\s*(if|else|switch|case|default))[\s\S]*$/, {token:'non-keyword', log: 'found number $0 in state $S0'}],
-				//keywords
-				[/\s*(if|else|elseif|switch|case|default)\s*:/,'keywords']
+				
 			],
 			fence_block: [
 				[/`{3}\s*$/, 'fence-block', '@pop'],
@@ -104,12 +99,12 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			expression: [
 				[/}/, 'expression', '@pop'],
 				[/\(/, { token: 'parameters', next: '@parameters' }],
-				[/[^\),]/, 'expression.content']
+				[/[^\(\),]/, 'expression.content']
 			],
 			parameters: [
 				[/\)/, 'parameters', '@pop'],
 				[/\{/, { token: 'expression', next: '@expression' }],
-				[/[^\},]/, 'parameters.content']
+				[/[^\(\{\},]/, 'parameters.content']
 			],
 			structure_lg: [
 				[/^\s*\]\s*$/, 'structure-lg', '@pop'],
