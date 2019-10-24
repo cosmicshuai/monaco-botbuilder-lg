@@ -47,7 +47,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 		tokenizer: {
 			root: [
 				// template name line
-				[/^\s*#/, { token: 'template-name-identifier', next: '@template_name' }],
+				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
 				// template body
 				[/^\s*-/, { token: 'template-body-identifier', goBack: 1, next: '@template_body' }],
 				//comments
@@ -61,7 +61,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 
 			],
 			comments: [
-				[/^\s*#/, { token: 'template-name-identifier', next: '@template_name' }],
+				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
 				[/^\s*-/, { token: 'template-body-identifier', next: '@template_body' }],
 				[/./, 'comments']
 			],
@@ -83,9 +83,9 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				//comments
 				[/^\s*>/, { token: 'comments', next: '@comments' }],
 				//template name
-				[/^\s*#/, { token: 'template-name-identifier', next: '@template_name' }],
+				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
 				//keywords
-				[/(-\s*)(if|else|else\s*if|switch|case|default)(\s*:)/, ['identifier', 'keywords', 'colon']],
+				[/(\s*-\s*)(if|else|else\s*if|switch|case|default)(\s*:)/, ['identifier', 'keywords', 'colon']],
 				//template_body
 				[/^\s*-/, { token: 'template-body-identifier', next: '@template_body' }],
 				//fence block
