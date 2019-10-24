@@ -39,53 +39,70 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 
 	monaco.languages.setMonarchTokensProvider('botbuilderlg', {
 		ignoreCase: true,
+		brackets: [
+			{ open: '{', close: '}', token: 'delimiter.curly' },
+			{ open: '[', close: ']', token: 'delimiter.bracket' },
+			{ open: '(', close: ')', token: 'delimiter.parenthesis' }
+		],
 		tokenizer: {
 			root: [
 				// template name line
-				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
+				[/^\s*#/, { token: 'template-name-identifier', next: '@template_name' }],
 				// template body
-				[/^\s*-/, { token: 'template-body-identifier', goBack: 1, next: '@teamplate_body'}],
+				[/^\s*-/, { token: 'template-body-identifier', goBack: 1, next: '@template_body' }],
 				//comments
 				[/^\s*>/, { token: 'comments', next: '@comments' }],
 				// import statement in lg
 				[/\[.*\]/, 'imports'],
 				//inline string
 				[/^\s*\"/, { token: 'inline-string', next: '@inline_string' }],
+				//bracktets
+				[/[{}()\[\]]/, '@brackets']
+
 			],
 			comments: [
-				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
-				[/^\s*-/, { token: 'template-body-identifier', next: '@teamplate_body' }],
+				[/^\s*#/, { token: 'template-name-identifier', next: '@template_name' }],
+				[/^\s*-/, { token: 'template-body-identifier', next: '@template_body' }],
 				[/./, 'comments']
 			],
 			template_name: [
 				//comments
-				[/^\s*>/, { token: 'comments', next: '@comments'}],
+				[/^\s*>/, { token: 'comments', next: '@comments' }],
 				//template_body
-				[/^\s*-/, { token: 'template-body-identifier', goBack: 1, next: '@teamplate_body' }],
+				[/^\s*-/, { token: 'template-body-identifier', goBack: 1, next: '@template_body' }],
 				// structure_lg
 				[/^\s*\[/, { token: 'structure-lg', next: '@structure_lg' }],
-				//default content
-				[/./, 'template-name.content']
+				//parameter in template name
+				[/([a-zA-Z0-9_.' ]+)(,|\))/, ['parameter', 'delimeter']],
+				// other
+				[/./, 'template-name']
 			],
-			teamplate_body: [
+			template_body: [
 				//pop 
 				[/[/s/S]*$/, '@pop'],
 				//comments
 				[/^\s*>/, { token: 'comments', next: '@comments' }],
 				//template name
-				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
+				[/^\s*#/, { token: 'template-name-identifier', next: '@template_name' }],
 				//keywords
-				[/(-\s*)(if|else|else\s*if|switch|case|default)(\s*:)/,['identifier', 'keywords', 'colon']],
+				[/(-\s*)(if|else|else\s*if|switch|case|default)(\s*:)/, ['identifier', 'keywords', 'colon']],
 				//template_body
-				[/^\s*-/, { token: 'template-body-identifier', next: '@teamplate_body' }],
+				[/^\s*-/, { token: 'template-body-identifier', next: '@template_body' }],
 				//fence block
 				[/`{3}/, { token: 'fence-block', next: '@fence_block' }],
 				//template-ref 
-				[/\[(.*?)(\(.*?(\[.+\])?\))?\]/, 'template-ref'],
+				[/\[/, {token : 'template-ref', next: 'template_ref'}],
 				//expression
 				[/\{/, { token: 'expression', next: '@expression' }],
-				
 			],
+
+			template_ref:
+			[
+				[/\]/, 'template-ref', '@pop'],
+				[/([a-zA-Z0-9_.]+)(\()/,[{token:'function-name'}, {token:'param_identifier'}]],
+				[/([a-zA-Z0-9_.' ]+)(,|\))/, ['parameter', 'delimeter']],
+			],
+
 			fence_block: [
 				[/`{3}\s*$/, 'fence-block', '@pop'],
 				[/\{/, { token: 'expression', next: '@expression' }],
@@ -97,27 +114,20 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				[/./, 'inline-string.content']
 			],
 			expression: [
-				[/}/, 'expression', '@pop'],
-				[/\(/, { token: 'parameters', next: '@parameters' }],
-				[/[^\(\),]/, 'expression.content']
-			],
-			parameters: [
-				[/\)/, 'parameters', '@pop'],
-				[/\{/, { token: 'expression', next: '@expression' }],
-				[/[^\(\{\},]/, 'parameters.content']
+				[/\}/, 'expression', '@pop'],
+				[/([a-zA-Z0-9_.]+)(\()/,[{token:'function-name'}, {token:'param_identifier'}]],
+				[/([a-zA-Z0-9_.' ]+)(,|\))/, ['parameter', 'delimeter']],
+				[/./, 'expression.content']
 			],
 			structure_lg: [
 				[/^\s*\]\s*$/, 'structure-lg', '@pop'],
-				[/^\s*>[\s\S]*$/,  'comments'],
+				[/^\s*>[\s\S]*$/, 'comments'],
 				[/(=|\|)([a_zA-Z0-9@ ]|\@)*\{/, { token: 'expression', next: '@expression' }],
 				[/^\s*\{/, { token: 'expression', next: '@expression' }],
 				[/=\s*[\s\S]+\s*$/, { token: 'structure-property' }],
 				[/\s*[a-zA-Z0-9_ ]+\s*$/, { token: 'structure-name' }],
 				[/./, 'structure-lg.content']
 			],
-			// keywords: [
-			// 	[/(if|else|else\s*if|switch|case|default)s*:/, 'keywords']
-			// ]
 		}
 	});
 	
