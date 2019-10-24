@@ -75,7 +75,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				//parameter in template name
 				[/([a-zA-Z0-9_.' ]+)(,|\))/, ['parameter', 'delimeter']],
 				// other
-				[/./, 'template-name']
+				[/[^\()]/, 'template-name']
 			],
 			template_body: [
 				//pop 
@@ -100,7 +100,10 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			[
 				[/\]/, 'template-ref', '@pop'],
 				[/([a-zA-Z0-9_.]+)(\()/,[{token:'function-name'}, {token:'param_identifier'}]],
-				[/([a-zA-Z0-9_.' ]+)(,|\))/, ['parameter', 'delimeter']],
+				[/'[\s\S]*?'/, 'string'],
+				[/([a-zA-Z][a-zA-Z0-9_. ]*)(,|\))/, ['parameter', 'delimeter']],
+				[/([a-zA-Z][a-zA-Z0-9_. ]*)/, 'parameter'],
+				[/[0-9.]+/, 'number']
 			],
 
 			fence_block: [
@@ -115,8 +118,11 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			],
 			expression: [
 				[/\}/, 'expression', '@pop'],
-				[/([a-zA-Z0-9_.]+)(\()/,[{token:'function-name'}, {token:'param_identifier'}]],
-				[/([a-zA-Z0-9_.' ]+)(,|\))/, ['parameter', 'delimeter']],
+				[/([a-zA-Z][a-zA-Z0-9_.]*)(\()/,[{token:'function-name'}, {token:'param_identifier'}]],
+				[/'[\s\S]*?'/, 'string'],
+				[/([a-zA-Z][a-zA-Z0-9_. ]*)(,|\))/, ['parameter', 'delimeter']],
+				[/([a-zA-Z][a-zA-Z0-9_. ]*)/, 'parameter'],
+				[/[0-9.]+/, 'number'],
 				[/./, 'expression.content']
 			],
 			structure_lg: [
