@@ -1,6 +1,6 @@
 {
   "name": "monaco-botbuilder-lg",
-  "version": "1.1.2",
+  "version": "1.1.4",
   "description": "Microsoft botbuilder-lg support for Monaco Editor",
   "scripts": {
     "compile-amd": "mcopy ./src/lib/LGbundle.js ./release/dev/lib/LGbundle.js && tsc -p ./src/tsconfig.json",
