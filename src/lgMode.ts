@@ -24,9 +24,9 @@ export function getLGWorker(): Promise<(first: Uri, ...more: Uri[]) => Promise<L
 	return new Promise((resolve, reject) => {
 		if (!lgWorker) {
 			return reject("LG not registered!");
-		}
+		};
 
-		resolve(lgWorker);
+		resolve(lgWorker); 
 	});
 }
 
@@ -73,7 +73,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				// structure_lg
 				[/^\s*\[/, { token: 'structure-lg', next: '@structure_lg' }],
 				//parameter in template name
-				[/([a-zA-Z0-9_.' ]+)(,|\))/, ['parameter', 'delimeter']],
+				[/([a-zA-Z0-9_.'-]+)(,|\))/, ['parameter', 'delimeter']],
 				// other
 				[/[^\()]/, 'template-name']
 			],
@@ -93,22 +93,22 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				//template-ref 
 				[/\[/, {token : 'template-ref', next: 'template_ref'}],
 				//expression
-				[/\{/, { token: 'expression', next: '@expression' }],
+				[/@\{/, { token: 'expression', next: '@expression' }],
 			],
 
 			template_ref:
 			[
 				[/\]/, 'template-ref', '@pop'],
-				[/([a-zA-Z0-9_.]+)(\()/,[{token:'function-name'}, {token:'param_identifier'}]],
+				[/([a-zA-Z0-9_.-]+)(\()/,[{token:'function-name'}, {token:'param_identifier'}]],
 				[/'[\s\S]*?'/, 'string'],
-				[/([a-zA-Z][a-zA-Z0-9_. ]*)(,|\))/, ['parameter', 'delimeter']],
-				[/([a-zA-Z][a-zA-Z0-9_. ]*)/, 'parameter'],
+				[/([a-zA-Z][a-zA-Z0-9_.-]*)(,|\))/, ['parameter', 'delimeter']],
+				[/([a-zA-Z][a-zA-Z0-9_.-]*)/, 'parameter'],
 				[/[0-9.]+/, 'number']
 			],
 
 			fence_block: [
 				[/`{3}\s*$/, 'fence-block', '@pop'],
-				[/\{/, { token: 'expression', next: '@expression' }],
+				[/@\{/, { token: 'expression', next: '@expression' }],
 				[/./, 'fence-block.content']
 			],
 			inline_string: [
@@ -118,10 +118,10 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			],
 			expression: [
 				[/\}/, 'expression', '@pop'],
-				[/([a-zA-Z][a-zA-Z0-9_.]*)(\()/,[{token:'function-name'}, {token:'param_identifier'}]],
+				[/([a-zA-Z][a-zA-Z0-9_.-]*)(\()/,[{token:'function-name'}, {token:'param_identifier'}]],
 				[/'[\s\S]*?'/, 'string'],
-				[/([a-zA-Z][a-zA-Z0-9_. ]*)(,|\))/, ['parameter', 'delimeter']],
-				[/([a-zA-Z][a-zA-Z0-9_. ]*)/, 'parameter'],
+				[/([a-zA-Z][a-zA-Z0-9_.-]*)(,|\))/, ['parameter', 'delimeter']],
+				[/([a-zA-Z][a-zA-Z0-9_.-]*)/, 'parameter'],
 				[/[0-9.]+/, 'number'],
 				[/./, 'expression.content']
 			],
@@ -129,9 +129,9 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				[/^\s*\]\s*$/, 'structure-lg', '@pop'],
 				[/^\s*>[\s\S]*$/, 'comments'],
 				[/(=|\|)([a_zA-Z0-9@ ]|\@)*\{/, { token: 'expression', next: '@expression' }],
-				[/^\s*\{/, { token: 'expression', next: '@expression' }],
+				[/^\s*@\{/, { token: 'expression', next: '@expression' }],
 				[/=\s*[\s\S]+\s*$/, { token: 'structure-property' }],
-				[/\s*[a-zA-Z0-9_ ]+\s*$/, { token: 'structure-name' }],
+				[/\s*[a-zA-Z0-9_-]+\s*$/, { token: 'structure-name' }],
 				[/./, 'structure-lg.content']
 			],
 		}

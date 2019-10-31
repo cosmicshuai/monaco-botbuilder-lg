@@ -204,63 +204,69 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
 		return ['.'];
 	}
 
+	private async matchedStates(model: monaco.editor.IReadOnlyModel, position: Position): Promise<{matched: boolean; state:string}> {
+		const state : string[] = [];
+		const lineContent = model.getLineContent(position.lineNumber);
+		let flag = false;
+		let finalState = '';
+		if (lineContent.trim().indexOf('-') !== 0) {
+			return {matched: flag, state:finalState}
+		};
+
+		//if the line starts with '-', will try to match
+		flag = true;
+		//initilize the state to plaintext
+		state.push('PlainText');
+		let i = 0;
+		while (i < lineContent.length) {
+			let char = lineContent.charAt(i);
+			if (char === `'`) {
+				if (state[state.length -1] === 'expression' || state[state.length -1] === 'double') {
+					state.push('single')
+				} else {
+					state.pop()
+				}
+			}
+
+			if (char === `"`) {
+				if (state[state.length -1] === 'expression' || state[state.length -1] === 'single') {
+					state.push('double')
+				} else {
+					state.pop()
+				}
+			}			
+
+			if (char === '{' && i >= 1 && state[state.length -1] !== 'single' && state[state.length -1] !== 'double' ) {
+				if (lineContent.charAt(i-1) === '@') {
+					state.push('expression')
+				}
+			}
+
+			if (char === '}' && state[state.length -1] === 'expression') {
+				state.pop()
+			}
+			console.log(state);
+			i = i + 1
+	};
+	finalState = state[state.length -1]
+	return {matched: flag, state:finalState}
+}
+
+	private removeParamFormar(params: string): string {
+		const paramArr: string[] = params.split(",");
+		const resultArr: string[] = [];
+		paramArr.forEach(element => { resultArr.push(element.trim().split(':')[0])});
+		return resultArr.join(' ,');
+	}
+
 	provideCompletionItems(model: monaco.editor.IReadOnlyModel, position: Position, _context: monaco.languages.CompletionContext, token: CancellationToken): Thenable<monaco.languages.CompletionList> {
 		const wordInfo = model.getWordUntilPosition(position);
 		const wordRange = new Range(position.lineNumber, wordInfo.startColumn, position.lineNumber, wordInfo.endColumn);
 		const resource = model.uri;
 
-		return this._worker(resource).then(() => {
-			let suggestions: monaco.languages.CompletionItem[] = [{
-				label: 'ifelse',
-				kind: monaco.languages.CompletionItemKind.Snippet,
-				range: wordRange,
-				insertText: [
-					'- if (${1:condition}) {',
-					'- \t$0',
-					'- else:',
-					'-\t'
-				].join('\n'),
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'If-Else Statement'
-			},
-			{
-				label: 'template',
-				kind: monaco.languages.CompletionItemKind.Snippet,
-				range: wordRange,
-				insertText: [
-					"# ${1:template_name}(${2:optional_parameters})",
-					"- hi"
-				].join('\n'),
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'New Template'
-			},
-			{
-				label: 'import',
-				kind: monaco.languages.CompletionItemKind.Snippet,
-				range: wordRange,
-				insertText: [
-					"[import](${1:relative path of extra lg file})"
-				].join('\n'),
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'New import'
-			},
-			{
-				label: 'switchcase',
-				kind: monaco.languages.CompletionItemKind.Snippet,
-				range: wordRange,
-				insertText: [
-					"SWITCH:{${1:case}}",
-						  "- CASE: {${2:case1}}",
-						  "    - ${3:output1}",
-						  "- CASE: {${4:case2}}",
-						  "    - ${5:output2}",
-						  "- DEFAULT:",
-						  "   - ${6:final output}"
-				].join('\n'),
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				documentation: 'Switch case Statement'
-			}];
-
+		return this._worker(resource).then(() =>this.matchedStates(model, position).then(
+			(match) => {
+			let suggestions: monaco.languages.CompletionItem[] = [];
 			let functions = buildInfunctionsMap;
 			functions.forEach((value, key) => {
 				let item = {
@@ -268,7 +274,7 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
 					kind: monaco.languages.CompletionItemKind.Function,
 					range: wordRange,
 					//TODO: a little more to do to make completion more concrete
-					insertText: key+ '(' + value.Params.toString() + ')', 
+					insertText: key+ '(' + this.removeParamFormar(value.Params.toString()) + ')', 
 					insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 					documentation: value.Introduction
 				};
@@ -298,19 +304,12 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
 					suggestions.push(item);
 				});
 			}
-			// {
-			// 	label: 'add',
-			// 	kind: monaco.languages.CompletionItemKind.Function,
-			// 	range: wordRange,
-			// 	insertText: 'add(${1:number}, ${2:number})',
-			// 	insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-			// 	documentation: 'Return the result from adding two numbers.'
-			// }
-
-			return {
-				suggestions
-			};
-		});
+			if (match.matched && match.state === 'expression'){
+				return {
+					suggestions
+				};
+			}
+		}));
 	}
 }
 
