@@ -245,7 +245,6 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
 			if (char === '}' && state[state.length -1] === 'expression') {
 				state.pop()
 			}
-			console.log(state);
 			i = i + 1
 	};
 	finalState = state[state.length -1]
