@@ -77,9 +77,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				// other
 				[/[^\()]/, 'template-name']
 			],
-			template_body: [
-				//pop 
-				[/[\s\S]*$/, '@pop'],
+			template_body: [				
 				//comments
 				[/^\s*>/, { token: 'comments', next: '@comments' }],
 				//template name
@@ -94,6 +92,8 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				[/\[/, {token : 'template-ref', next: 'template_ref'}],
 				//expression
 				[/@\{/, { token: 'expression', next: '@expression' }],
+				//pop 
+				[/[\s\S]*$/, '@pop'],
 			],
 
 			template_ref:
