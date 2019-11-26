@@ -52,13 +52,6 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				[/^\s*-/, { token: 'template-body-identifier', goBack: 1, next: '@template_body' }],
 				//comments
 				[/^\s*>/, { token: 'comments', next: '@comments' }],
-				// import statement in lg
-				[/\[.*\]/, 'imports'],
-				//inline string
-				[/^\s*\"/, { token: 'inline-string', next: '@inline_string' }],
-				//bracktets
-				[/[{}()\[\]]/, '@brackets']
-
 			],
 			comments: [
 				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
@@ -104,11 +97,6 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				[/@\{/, { token: 'expression', next: '@expression' }],
 				[/./, 'fence-block.content']
 			],
-			inline_string: [
-				[/\"\s*$/, 'inline-string', '@pop'],
-				[/\{/, { token: 'expression', next: '@expression' }],
-				[/./, 'inline-string.content']
-			],
 			expression: [
 				[/\}/, 'expression', '@pop'],
 				[/([a-zA-Z][a-zA-Z0-9_.-]*)(\s*\()/,[{token:'function-name'}, {token:'param_identifier'}]],
@@ -120,6 +108,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			],
 			structure_lg: [
 				[/^\s*\]\s*$/, 'structure-lg', '@pop'],
+				[/\]\s*$/, 'imports', '@pop'],
 				[/^\s*>[\s\S]*$/, 'comments'],
 				[/(=|\|)([a_zA-Z0-9\s]|\@)*\{/, { token: 'expression', next: '@expression' }],
 				[/^\s*@\{/, { token: 'expression', next: '@expression' }],
