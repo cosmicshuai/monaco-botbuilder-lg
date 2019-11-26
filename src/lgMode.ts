@@ -63,19 +63,24 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			comments: [
 				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
 				[/^\s*-/, { token: 'template-body-identifier', next: '@template_body' }],
-				[/./, 'comments']
+				[/$/, 'comments', '@pop']
 			],
 			template_name: [
 				//comments
 				[/^\s*>/, { token: 'comments', next: '@comments' }],
+				//fence block
+				[/^\s*-\s*`{3}/, { token: 'fence-block', next: '@fence_block' }],
 				//template_body
 				[/^\s*-/, { token: 'template-body-identifier', goBack: 1, next: '@template_body' }],
 				// structure_lg
 				[/^\s*\[/, { token: 'structure-lg', next: '@structure_lg' }],
 				//parameter in template name
 				[/([a-zA-Z0-9_.'-]+)(,|\))/, ['parameter', 'delimeter']],
+				//expression
+				[/@\{/, { token: 'expression', next: '@expression' }],
 				// other
-				[/[^\()]/, 'template-name']
+				[/[^\()]/, 'template-name'],
+
 			],
 			template_body: [				
 				//comments
@@ -84,30 +89,18 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
 				//keywords
 				[/(\s*-\s*)(if|else|else\s*if|switch|case|default)(\s*:)/, ['identifier', 'keywords', 'colon']],
+				//fence block
+				[/^\s*-\s*`{3}/, { token: 'fence-block', next: '@fence_block' }],
 				//template_body
 				[/^\s*-/, { token: 'template-body-identifier', next: '@template_body' }],
-				//fence block
-				[/`{3}/, { token: 'fence-block', next: '@fence_block' }],
-				//template-ref 
-				[/\[/, {token : 'template-ref', next: 'template_ref'}],
 				//expression
 				[/@\{/, { token: 'expression', next: '@expression' }],
-				//pop 
-				[/[\s\S]*$/, '@pop'],
-			],
-
-			template_ref:
-			[
-				[/\]/, 'template-ref', '@pop'],
-				[/([a-zA-Z0-9_.-]+)(\()/,[{token:'function-name'}, {token:'param_identifier'}]],
-				[/'[\s\S]*?'/, 'string'],
-				[/([a-zA-Z][a-zA-Z0-9_.-]*)(,|\))/, ['parameter', 'delimeter']],
-				[/([a-zA-Z][a-zA-Z0-9_.-]*)/, 'parameter'],
-				[/[0-9.]+/, 'number']
 			],
 
 			fence_block: [
 				[/`{3}\s*$/, 'fence-block', '@pop'],
+				//template name
+				[/^\s*#/, { token: 'template-name', next: '@template_name'}],
 				[/@\{/, { token: 'expression', next: '@expression' }],
 				[/./, 'fence-block.content']
 			],
@@ -118,7 +111,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			],
 			expression: [
 				[/\}/, 'expression', '@pop'],
-				[/([a-zA-Z][a-zA-Z0-9_.-]*)(\()/,[{token:'function-name'}, {token:'param_identifier'}]],
+				[/([a-zA-Z][a-zA-Z0-9_.-]*)(\s*\()/,[{token:'function-name'}, {token:'param_identifier'}]],
 				[/'[\s\S]*?'/, 'string'],
 				[/([a-zA-Z][a-zA-Z0-9_.-]*)(,|\))/, ['parameter', 'delimeter']],
 				[/([a-zA-Z][a-zA-Z0-9_.-]*)/, 'parameter'],
