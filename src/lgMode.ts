@@ -53,7 +53,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				//comments
 				[/^\s*>/, { token: 'comments', next: '@comments' }],
 				//dealing with inline-lg
-				[/^\s*\[/, { token: 'structure-lg', next: '@structure_lg' }],
+				[/^\s*\[/, { token: 'structure-lg-identifier', goBack: 1, next: '@structure_lg' }],
 			],
 			comments: [
 				[/^\s*#/, { token: 'template-name', next: '@template_name' }],
@@ -68,7 +68,7 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 				//template_body
 				[/^\s*-/, { token: 'template-body-identifier', goBack: 1, next: '@template_body' }],
 				// structure_lg
-				[/^\s*\[/, { token: 'structure-lg', next: '@structure_lg' }],
+				[/^\s*\[/, { token: 'structure-lg-identifier', goBack: 1, next: '@structure_lg' }],
 				//parameter in template name
 				[/([a-zA-Z0-9_.'-]+)(,|\))/, ['parameter', 'delimeter']],
 				//expression
@@ -111,11 +111,10 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			structure_lg: [
 				[/^\s*\]\s*$/, 'structure-lg', '@pop'],
 				[/\]\s*$/, 'imports', '@pop'],
+				[/(\s*\[\s*)([a-zA-Z0-9_-]+\s*$)/, ['stucture-lg-identifier', 'structure-name']],
 				[/^\s*>[\s\S]*$/, 'comments'],
-				[/(=|\|)([a_zA-Z0-9\s]|\@)*\{/, { token: 'expression', next: '@expression' }],
-				[/^\s*@\{/, { token: 'expression', next: '@expression' }],
-				[/=\s*[\s\S]+\s*$/, { token: 'structure-property' }],
-				[/\s*[a-zA-Z0-9_-]+\s*$/, { token: 'structure-name' }],
+				[/@\{/, { token: 'expression', next: '@expression' }],
+				[/.*=/, { token: 'structure-property'}],
 				[/./, 'structure-lg.content']
 			],
 		}
