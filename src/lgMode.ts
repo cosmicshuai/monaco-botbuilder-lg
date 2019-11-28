@@ -95,7 +95,6 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): (firs
 			fence_block: [
 				[/`{3}\s*$/, 'fence-block', '@pop'],
 				//template name
-				[/^\s*#/, { token: 'template-name', next: '@template_name'}],
 				[/@\{/, { token: 'expression', next: '@expression' }],
 				[/./, 'fence-block.content']
 			],
