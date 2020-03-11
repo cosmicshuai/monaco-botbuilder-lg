@@ -11,6 +11,7 @@ import * as languageFeatures from './languageFeatures';
 
 import Uri = monaco.Uri;
 
+
 let lgWorker: (first: Uri, ...more: Uri[]) => Promise<LGWorker>;
 
 export function setupLG(defaults: LanguageServiceDefaultsImpl): void {
